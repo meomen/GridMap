@@ -1,5 +1,9 @@
 var uiSettings = {
-    gridToViewportLeastDiameterRatio: 0.6
+    gridToViewportLeastDiameterRatio: 0.6,
+    LatOrigin: 20.95,
+    LngOrigin: 105.765,
+    scale: 54,
+    size: 0.0025
 };
 
 function Grid(center, radius) {
@@ -12,12 +16,18 @@ Grid.prototype.getBounds = function () {
     return this.rectangleBounds(0, 0, 1);
 };
 Grid.prototype.rectangleBounds = function (x, y, scale) {
-    var yStep = this.radius * 2 / scale;
-    var xStep = yStep * 2;
-    var north = this.center.lat() - this.radius + yStep * x;
-    var south = this.center.lat() - this.radius + yStep * (x + 1);
-    var west = this.center.lng() - this.radius * 2 + xStep * (y + 1);
-    var east = this.center.lng() - this.radius * 2 + xStep * y;
+    // var yStep = this.radius * 2 / scale;
+    // var xStep = yStep;
+    // var north = uiSettings.LatOrigin - this.radius + yStep * x;
+    // var south = uiSettings.LatOrigin - this.radius + yStep * (x + 1);
+    // var west = uiSettings.LngOrigin - this.radius * 2 + xStep * (y + 1);
+    // var east = uiSettings.LngOrigin - this.radius * 2 + xStep * y;
+
+    var north = uiSettings.LatOrigin + uiSettings.size * (x + 1);
+    var south = uiSettings.LatOrigin + uiSettings.size * x;
+    var east = uiSettings.LngOrigin + uiSettings.size * y;
+    var west = uiSettings.LngOrigin + uiSettings.size * (y + 1);
+
     return new google.maps.LatLngBounds(
         new google.maps.LatLng(north, east),
         new google.maps.LatLng(south, west)
@@ -45,7 +55,8 @@ function GridOverlay(map) {
 }
 
 GridOverlay.prototype.computeRadius = function () {
-    return (this.map.getBounds().getNorthEast().lat() - this.map.getBounds().getSouthWest().lat()) * uiSettings.gridToViewportLeastDiameterRatio / 2
+    // return (this.map.getBounds().getNorthEast().lat() - this.map.getBounds().getSouthWest().lat()) * uiSettings.gridToViewportLeastDiameterRatio / 2
+    return (105.9 - 105.765) /2
 };
 GridOverlay.prototype.redraw = function () {
     this.elements.forEach(function (element) {
@@ -67,14 +78,14 @@ GridOverlay.prototype.currentGrid = function () {
     }
 };
 GridOverlay.prototype.createElements = function (grid) {
-    var rectanglesBounds = grid.createRectanglesBounds(5);
+    var rectanglesBounds = grid.createRectanglesBounds(uiSettings.scale);
     return rectanglesBounds.map(function (bounds) {
         return new google.maps.Rectangle({
             strokeColor: '#837c21',
             strokeOpacity: 0.5,
-            strokeWeight: 2,
-            fillColor: '#fff43d',
-            fillOpacity: 0.1,
+            strokeWeight: 1,
+            fillColor: '#cccccc',
+            fillOpacity: 0,
             bounds: bounds
         })
     })
@@ -88,7 +99,7 @@ var gridOverlay;
 
 function initMap() {
     var ufa = {
-        coords: new google.maps.LatLng(54.7751429, 55.9860734)
+        coords: new google.maps.LatLng(21.0175, 105.8325)
     };
     var startingCoords = ufa.coords;
     map = new google.maps.Map(
@@ -98,16 +109,17 @@ function initMap() {
                 lat: startingCoords.lat(),
                 lng: startingCoords.lng()
             },
-            zoom: 10
+            zoom: 12.75,
+            mapId : '42036b35e2b13e35'
         }
     );
     setTimeout(function () {
-        map.addListener('zoom_changed', function () {
-            gridOverlay.redraw();
-        });
-        map.addListener('center_changed', function () {
-            gridOverlay.redraw();
-        });
+        // map.addListener('zoom_changed', function () {
+        //     gridOverlay.redraw();
+        // });
+        // map.addListener('center_changed', function () {
+        //     gridOverlay.redraw();
+        // });
         gridOverlay = new GridOverlay(map);
         gridOverlay.init();
         gridOverlay.redraw();
