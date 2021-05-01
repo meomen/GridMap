@@ -6,9 +6,60 @@
     <meta charset="utf-8">
     <link rel="stylesheet" href="../css/styles.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
-<div id="map"></div>
+<div class="row" id="content">
+    <div id="map" class="col-lg-9 col-md-8 col-sm-7"></div>
+    <div id="action_native" class="col-lg-3 col-md-4 col-sm-5">
+        <nav class="nav nav-tabs justify-content-center">
+            <a class="nav-link active" id="trip-tab" data-toggle="tab" href="#trip">Trip</a>
+            <a class="nav-link" id="frequent-route-tab" data-toggle="tab" href="#frequent-route">Frequent Route</a>
+        </nav>
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="trip">
+                <fieldset class="inline-fields block_input" id="form_input_account">
+                    <label>Account</label>
+                    <div class="row col-md-12 col-sm-12">
+                        <div class="row col-sm-4 col-md-4">
+                            <select class="form-control" id="select_type_input">
+                                <option value="ID">ID</option>
+                                <option value="Name">Name</option>
+                            </select>
+                        </div>
+                        <div class="row col-sm-10 col-md-10">
+                            <input type="text" class="form-control" id="input_account"
+                                   name="account">
+                        </div>
+                    </div>
+                </fieldset>
+
+                <fieldset class="inline-fields block_input" id="form_input_date">
+                    <label>Account</label>
+                    <div class="row col-sm-12">
+                        <div class="row col-sm-4 col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-all-date" type="checkbox" value="" id="flexCheckDefault">
+                                <label class="form-check-label" for="flexCheckDefault">
+                                    All
+                                </label>
+                            </div>
+                        </div>
+                        <div class="row col-sm-10 col-md-10">
+
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="tab-pane fade" id="frequent-route">
+                <p>Tempora culpa magna ipsum class diam qui dicta ad architecto sequi. ucimus accumsan</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <script type="text/javascript" src="../js/script.js"></script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB4VJk8kKw61sBvXi71WAEkfU57VWKrtas&map_ids=42036b35e2b13e35&callback=initMap"
         async defer></script>

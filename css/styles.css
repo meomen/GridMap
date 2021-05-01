@@ -1,6 +1,15 @@
-#map {
+/*#map {*/
+/*    height: 100%;*/
+/*}*/
+/*#action_native {*/
+/*    height: 100%;*/
+/*}*/
+#content{
     height: 100%;
-    width: 75%;
+    width: 100%;
+}
+.block_input {
+    margin-top: 30px;
 }
 
 html, body {
