@@ -48,7 +48,7 @@ function GridOverlay(map) {
 }
 
 GridOverlay.prototype.computeRadius = function () {
-    return (105.9 - 105.765) /2
+    return (105.9 - 105.765) / 2
 };
 GridOverlay.prototype.redraw = function () {
     var grid = this.currentGrid();
@@ -81,6 +81,7 @@ GridOverlay.prototype.createElements = function (grid) {
 GridOverlay.prototype.init = function () {
 
 };
+
 function CenterControl(controlDiv, map) {
     // Set CSS for the control border.
     var controlUI = document.createElement("div");
@@ -106,18 +107,17 @@ function CenterControl(controlDiv, map) {
     controlUI.appendChild(controlText);
     // Setup the click event listeners: simply set the map to Chicago.
     controlUI.addEventListener("click", () => {
-        gridOverlay.clickGridMap(controlUI,controlText);
+        gridOverlay.clickGridMap(controlUI, controlText);
     });
 }
 
-GridOverlay.prototype.clickGridMap = function (controlUI,controlText) {
-    if(this.elements == null) {
+GridOverlay.prototype.clickGridMap = function (controlUI, controlText) {
+    if (this.elements == null) {
         this.redraw();
         controlUI.style.backgroundColor = "#3498db";
         controlUI.style.border = "2px solid #3498db";
         controlText.style.color = "rgb(255,255,255)";
-    }
-    else {
+    } else {
         this.elements.forEach(function (element) {
             element.setMap(null);
         });
@@ -131,6 +131,12 @@ GridOverlay.prototype.clickGridMap = function (controlUI,controlText) {
 
 var map;
 var gridOverlay;
+var polylineOverlay;
+
+function PolylineOverlay(map) {
+    this.map = map;
+    this.elements = [];
+}
 
 function initMap() {
     var ufa = {
@@ -145,21 +151,271 @@ function initMap() {
                 lng: startingCoords.lng()
             },
             zoom: 12.75,
-            mapId : '42036b35e2b13e35'
+            mapId: '42036b35e2b13e35'
         }
     );
     setTimeout(function () {
-        // map.addListener('zoom_changed', function () {
-        //     gridOverlay.redraw();
-        // });
-        // map.addListener('center_changed', function () {
-        //     gridOverlay.redraw();
-        // });
         const centerControlDiv = document.createElement("div");
         CenterControl(centerControlDiv, map);
         map.controls[google.maps.ControlPosition.TOP_CENTER].push(centerControlDiv);
         gridOverlay = new GridOverlay(map);
+        polylineOverlay = new PolylineOverlay(map);
         gridOverlay.init();
         gridOverlay.redraw();
     }, 800);
+}
+
+/*
+ Tag 1
+ */
+var input_account1 = document.getElementById("input_account_1");
+var btn_search1 = document.getElementById("btn_search1");
+var check_all = document.getElementById("input_checkbox");
+var date_picker = document.getElementById("input_date");
+var btn_origin = document.getElementById("btn_origin");
+var btn_grid = document.getElementById("btn_grid");
+var tv_result_1 = document.getElementById("tv_result_1");
+var getAllDate = true;
+
+check_all.addEventListener("click", function () {
+    if (this.checked) {
+        date_picker.disabled = true;
+        getAllDate = true;
+        if (input_account1.value == "") {
+            btn_search1.disabled = true;
+        } else {
+            btn_search1.disabled = false;
+        }
+    } else {
+        date_picker.disabled = false;
+        getAllDate = false;
+        if (date_picker.value != "" && input_account1.value != "") {
+            btn_search1.disabled = false;
+        } else {
+            btn_search1.disabled = true;
+        }
+    }
+})
+
+input_account1.addEventListener("keyup", function () {
+    if (getAllDate) {
+        btn_search1.disabled = false;
+    } else if (date_picker.value == "") {
+        btn_search1.disabled = true;
+    }
+    if (input_account1.value == "") {
+        btn_search1.disabled = true;
+    }
+})
+date_picker.addEventListener("change", function () {
+    if (input_account1.value == "") {
+        btn_search1.disabled = true
+    } else {
+        btn_search1.disabled = false;
+    }
+})
+btn_origin.addEventListener("click", function () {
+    btn_grid.checked = false;
+})
+btn_grid.addEventListener("click", function () {
+    btn_origin.checked = false;
+})
+
+btn_search1.addEventListener("click", function () {
+    if (getAllDate && btn_origin.checked) {
+        getTripAll(input_account1.value);
+    } else if (!getAllDate && btn_origin.checked) {
+        getTripDate(input_account1.value, date_picker.value);
+    } else if (getAllDate && btn_grid.checked) {
+        getGridAll(input_account1.value);
+    } else {
+        getGridDate(input_account1.value, date_picker.value);
+    }
+})
+/*
+ Tag 2
+ */
+var input_account2 = document.getElementById("input_account_2");
+var btn_search2 = document.getElementById("btn_search2");
+var input_min_sup = document.getElementById("input_min_sup");
+var input_min_length = document.getElementById("input_min_length");
+
+input_account2.addEventListener("keyup", function () {
+    validate_input();
+})
+input_min_sup.addEventListener("keyup", function () {
+    validate_input();
+})
+input_min_length.addEventListener("keyup", function () {
+    validate_input();
+})
+
+function validate_input() {
+    if (input_account2.value == "" ||
+        input_min_length.value == "" ||
+        input_min_sup.value == "") {
+        btn_search2.disabled = true;
+    } else {
+        btn_search2.disabled = false;
+    }
+}
+
+btn_search2.addEventListener("click", function () {
+
+})
+
+/*
+ Call API Draw Trip
+ */
+function getTripAll(account_id) {
+    let url = new URL('http://localhost:8081/grid_map/trip/all')
+    url.search = new URLSearchParams({
+        account_id: account_id
+    })
+    sendRequest(url, false)
+}
+
+function getTripDate(account_id, date) {
+    let url = new URL('http://localhost:8081/grid_map/trip/date')
+    url.search = new URLSearchParams({
+        account_id: account_id,
+        date: date
+    })
+
+    sendRequest(url, false)
+}
+
+
+function drawRouteTrip(myJSON) {
+    var listTrip = [];
+    for (var i = 0; i < myJSON.length; i++) {
+        var trip = [];
+        for (var j = 0; j < myJSON[i].length; j++) {
+            var point = myJSON[i][j];
+            trip.push(new google.maps.LatLng(point.latitude, point.longitude));
+        }
+        var flightPath = new google.maps.Polyline({
+            path: trip,
+            geodesic: true,
+            strokeColor: '#e74c3c',
+            strokeOpacity: 0.3,
+            strokeWeight: 5
+        });
+        flightPath.setMap(map);
+        listTrip.push(flightPath);
+    }
+    polylineOverlay.elements = listTrip;
+}
+
+/*
+ Call API Draw Grid
+ */
+function getGridAll(account_id) {
+    let url = new URL('http://localhost:8081/grid_map/grid/all')
+    url.search = new URLSearchParams({
+        account_id: account_id
+    })
+    sendRequest(url, true)
+}
+
+function getGridDate(account_id, date) {
+    let url = new URL('http://localhost:8081/grid_map/grid/date')
+    url.search = new URLSearchParams({
+        account_id: account_id,
+        date: date
+    })
+
+    sendRequest(url, true)
+}
+
+function drawGridTrip(myJSON) {
+    var listGridTrip = [];
+    var resultGrid = "";
+    for (var i = 0; i < myJSON.length; i++) {
+        var trip = [];
+        var reslutGripLine = "";
+        for (var j = 0; j < myJSON[i].length; j++) {
+            var point = myJSON[i][j];
+            var lat = uiSettings.LatOrigin + (uiSettings.size * (point.lat - 1) + uiSettings.size / 2);
+            var lng = uiSettings.LngOrigin + (uiSettings.size * (point.lng - 1) + uiSettings.size / 2);
+            trip.push(new google.maps.LatLng(lat, lng));
+            reslutGripLine = writeResultGridLine(reslutGripLine,point.lat,point.lng,point.time);
+        }
+        resultGrid = resultGrid + "Route" + (i+1) +": " + reslutGripLine + "\n";
+        var flightPath = new google.maps.Polyline({
+            path: trip,
+            geodesic: true,
+            strokeColor: '#e74c3c',
+            strokeOpacity: 0.3,
+            strokeWeight: 5
+        });
+        flightPath.setMap(map);
+        listGridTrip.push(flightPath);
+    }
+    tv_result_1.value = resultGrid;
+    polylineOverlay.elements = listGridTrip;
+}
+
+/*
+ Chung
+*/
+function sendRequest(url, isGrid) {
+    var promise = fetch(url);
+    promise
+        .then(function (response) {
+            if (!response.ok) {
+                throw new Error("HTTP error, status = " + response.status);
+            }
+            return response.text();
+        })
+        .then(function (myText) {
+            var myJSON = null;
+
+            if (myText != null && myText.trim().length > 0) {
+                myJSON = JSON.parse(myText);
+            }
+            removePolyline();
+            if (isGrid) {
+                drawGridTrip(myJSON);
+            } else {
+                drawRouteTrip(myJSON);
+            }
+        })
+        .catch(function (error) {
+            console.log("Noooooo! Something error:");
+            console.log(error);
+        });
+}
+function writeResultGridLine(result, x, y, t) {
+    if(result != null && result != "") {
+        result = result + ", (" + x + ":" + y + ":" + t + ")"
+    }
+    else {
+        result = "(" + x + ":" + y + ":" + t + ")"
+    }
+    return result;
+}
+function removePolyline() {
+    if (polylineOverlay.elements != null) {
+        for (var i = 0; i < polylineOverlay.elements.length; i++) {
+            var element = polylineOverlay.elements[i];
+            element.setMap(null);
+        }
+        polylineOverlay.elements = null;
+    }
+}
+
+function drawGripOn(x, y) {
+    if (gridOverlay.elements != null) {
+        for (var i = 0; i < gridOverlay.elements.length; i++) {
+            if (i == x * y) {
+                console.log(i);
+                gridOverlay.elements[i].setOptions({
+                    fillColor: "#f1c40f",
+                    fillOpacity: 0.2,
+                });
+                gridOverlay.elements[i].setMap(map);
+            }
+        }
+    }
 }
