@@ -36,14 +36,14 @@
                 </fieldset>
 
                 <fieldset class="inline-fields block_input" id="form_input_date">
-                    <label>Account</label>
+                    <label>Date</label>
                     <div class="row col-sm-12">
                         <div class="row col-sm-4 col-md-4">
                             <div class="form-check">
-                                <input class="form-check-all-date" type="checkbox" value="" id="flexCheckDefault">
-                                <label class="form-check-label" for="flexCheckDefault">
-                                    All
-                                </label>
+                                <div class="custom-control custom-checkbox checkbox-lg">
+                                    <input type="checkbox" class="custom-control-input" id="input_checkbox" checked="">
+                                    <label class="custom-control-label" for="input_checkbox">All</label>
+                                </div>
                             </div>
                         </div>
                         <div class="row col-sm-10 col-md-10">
@@ -51,9 +51,55 @@
                         </div>
                     </div>
                 </fieldset>
+                <div class="block_input row  justify-content-center ">
+                    <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                        <label class="btn btn-info active ">
+                            <input type="radio"  id="btn_origin" autocomplete="off" checked> Origin
+                        </label>
+                        <label class="btn btn-info">
+                            <input type="radio"  id="btn_grid" autocomplete="off"> Grid
+                        </label>
+                    </div>
+                </div>
+                <div class="block_input row justify-content-center" >
+                    <button type="button" class="btn btn-light col-md-11 col-lg-11">Search</button>
+                </div>
             </div>
+
             <div class="tab-pane fade" id="frequent-route">
-                <p>Tempora culpa magna ipsum class diam qui dicta ad architecto sequi. ucimus accumsan</p>
+                <fieldset class="inline-fields block_input" id="form_input_account_2">
+                    <label>Account</label>
+                    <div class="row col-md-12 col-sm-12">
+                        <div class="row col-sm-4 col-md-4">
+                            <select class="form-control" id="select_type_input_2">
+                                <option value="ID">ID</option>
+                                <option value="Name">Name</option>
+                            </select>
+                        </div>
+                        <div class="row col-sm-10 col-md-10">
+                            <input type="text" class="form-control" id="input_account_2"
+                                   name="account">
+                        </div>
+                    </div>
+
+                   <div class="block_input">
+                       <div class="row col-md-12 col-sm-12 justify-content-center">
+                           <div class="row col-sm-5 col-md-5">
+                               <label>min-sup</label>
+                               <input type="text" class="form-control" id="input_min_sup">
+                           </div>
+                           <div class="row col-sm-3 col-md-3">
+                           </div>
+                           <div class="row col-sm-5 col-md-5" >
+                               <label>min-length</label>
+                               <input type="text" class="form-control" id="input_min_length">
+                           </div>
+                       </div>
+                   </div>
+                    <div class="block_input row justify-content-center" >
+                        <button type="button" class="btn btn-light col-md-11 col-lg-11">Search</button>
+                    </div>
+                </fieldset>
             </div>
         </div>
     </div>

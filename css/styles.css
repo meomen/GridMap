@@ -17,3 +17,20 @@ html, body {
     margin: 0;
     padding: 0;
 }
+
+.checkbox-lg .custom-control-label::before,
+.checkbox-lg .custom-control-label::after {
+    width: 1.55rem;
+    height: 1.55rem;
+}
+
+.checkbox-lg .custom-control-label {
+    padding-top: 3px;
+    padding-left: 6px;
+}
+#input_date {
+    margin-left: 30px;
+}
+.btn-group {
+    display: inline-block;
+}
