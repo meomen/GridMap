@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Cities: Skylines grid in Google Maps</title>
+    <title>Frequent Route</title>
     <meta name="viewport" content="initial-scale=1.0">
     <meta charset="utf-8">
-    <link rel="stylesheet" href="../css/styles.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
-
+    <link rel="stylesheet" href="../css/styles.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
@@ -18,9 +17,16 @@
             <a class="nav-link" id="frequent-route-tab" data-toggle="tab" href="#frequent-route">Frequent Route</a>
         </nav>
         <div class="tab-content">
+
+            <!--
+           --------------------------------------------------------------------------
+                  TAG 1
+           --------------------------------------------------------------------------
+               -->
+
             <div class="tab-pane fade show active" id="trip">
-                <fieldset class="inline-fields block_input" id="form_input_account">
-                    <label>Account</label>
+                <fieldset class="inline-fields block_input" id="form_input_account_1">
+                    <label><b>Account</b></label>
                     <div class="row col-md-12 col-sm-12">
                         <div class="row col-sm-4 col-md-4">
                             <select class="form-control" id="select_type_input">
@@ -29,25 +35,25 @@
                             </select>
                         </div>
                         <div class="row col-sm-10 col-md-10">
-                            <input type="text" class="form-control" id="input_account"
+                            <input type="text" class="form-control" id="input_account_1"
                                    name="account">
                         </div>
                     </div>
                 </fieldset>
 
                 <fieldset class="inline-fields block_input" id="form_input_date">
-                    <label>Date</label>
+                    <label><b>Date</b></label>
                     <div class="row col-sm-12">
                         <div class="row col-sm-4 col-md-4">
                             <div class="form-check">
                                 <div class="custom-control custom-checkbox checkbox-lg">
-                                    <input type="checkbox" class="custom-control-input" id="input_checkbox" checked="">
-                                    <label class="custom-control-label" for="input_checkbox">All</label>
+                                    <input type="checkbox" class="custom-control-input" id="input_checkbox" checked="true">
+                                    <label class="custom-control-label" for="input_checkbox">ALL</label>
                                 </div>
                             </div>
                         </div>
                         <div class="row col-sm-10 col-md-10">
-                            <input type="date" id="input_date" name="input_date">
+                            <input type="date" id="input_date" name="input_date" disabled>
                         </div>
                     </div>
                 </fieldset>
@@ -62,13 +68,27 @@
                     </div>
                 </div>
                 <div class="block_input row justify-content-center" >
-                    <button type="button" class="btn btn-light col-md-11 col-lg-11">Search</button>
+                    <button id="btn_search1" disabled type="button" class="btn btn-success col-md-11 col-lg-11">Search</button>
+                </div>
+                <div class="form-group block_result">
+                    <label for="tv_runtime_1"><i>Run time</i></label>
+                    <input type="text" class="form-control" id="tv_runtime_1" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="tv_result_1"><i>Result</i></label>
+                    <textarea class="form-control" id="tv_result_1" rows="4" readonly></textarea>
                 </div>
             </div>
 
+            <!--
+            --------------------------------------------------------------------------
+                   TAG 2
+            --------------------------------------------------------------------------
+                -->
+
             <div class="tab-pane fade" id="frequent-route">
                 <fieldset class="inline-fields block_input" id="form_input_account_2">
-                    <label>Account</label>
+                    <label><b>Account</b></label>
                     <div class="row col-md-12 col-sm-12">
                         <div class="row col-sm-4 col-md-4">
                             <select class="form-control" id="select_type_input_2">
@@ -85,21 +105,29 @@
                    <div class="block_input">
                        <div class="row col-md-12 col-sm-12 justify-content-center">
                            <div class="row col-sm-5 col-md-5">
-                               <label>min-sup</label>
-                               <input type="text" class="form-control" id="input_min_sup">
+                               <label><b>min-sup</b></label>
+                               <input type="number" step="0.01" min="0" max="1" class="form-control" id="input_min_sup">
                            </div>
                            <div class="row col-sm-3 col-md-3">
                            </div>
                            <div class="row col-sm-5 col-md-5" >
-                               <label>min-length</label>
-                               <input type="text" class="form-control" id="input_min_length">
+                               <label><b>min-length</b></label>
+                               <input type="number" min="0" class="form-control" id="input_min_length">
                            </div>
                        </div>
                    </div>
                     <div class="block_input row justify-content-center" >
-                        <button type="button" class="btn btn-light col-md-11 col-lg-11">Search</button>
+                        <button id="btn_search2" disabled type="button" class="btn btn-success col-md-11 col-lg-11 btn_search">Search</button>
                     </div>
                 </fieldset>
+                <div class="form-group block_result">
+                    <label for="tv_runtime_2"><i>Run time</i></label>
+                    <input type="text" class="form-control" id="tv_runtime_2" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="tv_result_2"><i>Result</i></label>
+                    <textarea class="form-control" id="tv_result_2" rows="4" readonly></textarea>
+                </div>
             </div>
         </div>
     </div>
