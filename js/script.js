@@ -239,6 +239,8 @@ var input_account2 = document.getElementById("input_account_2");
 var btn_search2 = document.getElementById("btn_search2");
 var input_min_sup = document.getElementById("input_min_sup");
 var input_min_length = document.getElementById("input_min_length");
+var tv_runtime_2 = document.getElementById("tv_runtime_2");
+var tv_result_2 = document.getElementById("tv_result_2");
 
 input_account2.addEventListener("keyup", function () {
     validate_input();
@@ -261,7 +263,9 @@ function validate_input() {
 }
 
 btn_search2.addEventListener("click", function () {
-
+    console.log()
+    findFrequentRoute(input_account2.value,input_min_sup.value,input_min_length.value);
+    drawFrequentRoute(input_account2.value);
 })
 
 /*
@@ -405,17 +409,86 @@ function removePolyline() {
     }
 }
 
-function drawGripOn(x, y) {
-    if (gridOverlay.elements != null) {
-        for (var i = 0; i < gridOverlay.elements.length; i++) {
-            if (i == x * y) {
-                console.log(i);
-                gridOverlay.elements[i].setOptions({
-                    fillColor: "#f1c40f",
-                    fillOpacity: 0.2,
-                });
-                gridOverlay.elements[i].setMap(map);
+/*
+Funtion of Tag 2
+ */
+
+function findFrequentRoute(account_id,min_sup,min_length) {
+    let url = new URL('http://localhost:8081/findFrequentRoute')
+    url.search = new URLSearchParams({
+        account_id: account_id,
+        min_support: min_sup,
+        min_length:min_length
+    })
+    var promise = fetch(url);
+    promise
+        .then(function (response) {
+            if (!response.ok) {
+                throw new Error("HTTP error, status = " + response.status);
             }
+            return response.text();
+        })
+        .then(function (myText) {
+            var myJSON = null;
+
+            if (myText != null && myText.trim().length > 0) {
+                myJSON = JSON.parse(myText);
+            }
+            tv_runtime_2.value = myJSON.runtime;
+            tv_result_2.value = myJSON.data;
+        })
+        .catch(function (error) {
+            console.log("Noooooo! Something error:");
+            console.log(error);
+        });
+}
+function drawFrequentRoute(account_id) {
+    console.log(account_id)
+    let url = new URL('http://localhost:8081/grid_map/frequent_route')
+    url.search = new URLSearchParams({
+        account_id: account_id,
+    })
+    var promise = fetch(url);
+    promise
+        .then(function (response) {
+            if (!response.ok) {
+                throw new Error("HTTP error, status = " + response.status);
+            }
+            return response.text();
+        })
+        .then(function (myText) {
+            var myJSON = null;
+
+            if (myText != null && myText.trim().length > 0) {
+                myJSON = JSON.parse(myText);
+            }
+            removePolyline();
+            drawFrequentRouteOnMap(myJSON)
+        })
+        .catch(function (error) {
+            console.log("Noooooo! Something error:");
+            console.log(error);
+        });
+}
+function drawFrequentRouteOnMap(myJSON) {
+    var listGridTrip = [];
+    for (var i = 0; i < myJSON.length; i++) {
+        var trip = [];
+        for (var j = 0; j < myJSON[i].length; j++) {
+            var point = myJSON[i][j];
+            var lat = uiSettings.LatOrigin + (uiSettings.size * (point.lat - 1) + uiSettings.size / 2);
+            var lng = uiSettings.LngOrigin + (uiSettings.size * (point.lng - 1) + uiSettings.size / 2);
+            trip.push(new google.maps.LatLng(lat, lng));
         }
+        var flightPath = new google.maps.Polyline({
+            path: trip,
+            geodesic: true,
+            strokeColor: '#e74c3c',
+            strokeOpacity: 0.3,
+            strokeWeight: 5
+        });
+        flightPath.setMap(map);
+        listGridTrip.push(flightPath);
     }
+    polylineOverlay.elements = listGridTrip;
 }
