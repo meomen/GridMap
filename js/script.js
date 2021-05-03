@@ -132,8 +132,13 @@ GridOverlay.prototype.clickGridMap = function (controlUI, controlText) {
 var map;
 var gridOverlay;
 var polylineOverlay;
+var markeroverlay;
 
 function PolylineOverlay(map) {
+    this.map = map;
+    this.elements = [];
+}
+function MarkerOverlay (map) {
     this.map = map;
     this.elements = [];
 }
@@ -160,6 +165,7 @@ function initMap() {
         map.controls[google.maps.ControlPosition.TOP_CENTER].push(centerControlDiv);
         gridOverlay = new GridOverlay(map);
         polylineOverlay = new PolylineOverlay(map);
+        markeroverlay = new MarkerOverlay(map);
         gridOverlay.init();
         gridOverlay.redraw();
     }, 800);
@@ -168,6 +174,8 @@ function initMap() {
 /*
  Tag 1
  */
+
+
 var input_account1 = document.getElementById("input_account_1");
 var btn_search1 = document.getElementById("btn_search1");
 var check_all = document.getElementById("input_checkbox");
@@ -263,9 +271,7 @@ function validate_input() {
 }
 
 btn_search2.addEventListener("click", function () {
-    console.log()
     findFrequentRoute(input_account2.value,input_min_sup.value,input_min_length.value);
-    drawFrequentRoute(input_account2.value);
 })
 
 /*
@@ -307,6 +313,9 @@ function drawRouteTrip(myJSON) {
         });
         flightPath.setMap(map);
         listTrip.push(flightPath);
+        drawMarker("origin","Origin Route "+i, myJSON[i][0].latitude,myJSON[i][0].longitude);
+        drawMarker("destination","Destination Route "+i, myJSON[i][myJSON[i].length-1].latitude,myJSON[i][myJSON[i].length-1].longitude);
+
     }
     polylineOverlay.elements = listTrip;
 }
@@ -355,6 +364,15 @@ function drawGridTrip(myJSON) {
         });
         flightPath.setMap(map);
         listGridTrip.push(flightPath);
+
+        var lat = uiSettings.LatOrigin + (uiSettings.size * (myJSON[i][0].lat- 1) + uiSettings.size / 2);
+        var lng = uiSettings.LngOrigin + (uiSettings.size * (myJSON[i][0].lng - 1) + uiSettings.size / 2);
+        drawMarker("origin","Origin Route "+i, lat, lng);
+
+        lat = uiSettings.LatOrigin + (uiSettings.size * (myJSON[i][myJSON[i].length-1].lat- 1) + uiSettings.size / 2);
+        lng = uiSettings.LngOrigin + (uiSettings.size * (myJSON[i][myJSON[i].length-1].lng - 1) + uiSettings.size / 2);
+        drawMarker("destination","Destination Route "+i, lat,lng);
+
     }
     tv_result_1.value = resultGrid;
     polylineOverlay.elements = listGridTrip;
@@ -401,11 +419,17 @@ function writeResultGridLine(result, x, y, t) {
 }
 function removePolyline() {
     if (polylineOverlay.elements != null) {
-        for (var i = 0; i < polylineOverlay.elements.length; i++) {
-            var element = polylineOverlay.elements[i];
+        polylineOverlay.elements.forEach(function (element) {
             element.setMap(null);
-        }
+        });
         polylineOverlay.elements = null;
+    }
+
+    if(markeroverlay.elements != null) {
+        markeroverlay.elements.forEach(function (element) {
+            element.setMap(null);
+        });
+        markeroverlay.elements = [];
     }
 }
 
@@ -436,6 +460,7 @@ function findFrequentRoute(account_id,min_sup,min_length) {
             }
             tv_runtime_2.value = myJSON.runtime;
             tv_result_2.value = myJSON.data;
+            drawFrequentRoute(input_account2.value);
         })
         .catch(function (error) {
             console.log("Noooooo! Something error:");
@@ -443,7 +468,6 @@ function findFrequentRoute(account_id,min_sup,min_length) {
         });
 }
 function drawFrequentRoute(account_id) {
-    console.log(account_id)
     let url = new URL('http://localhost:8081/grid_map/frequent_route')
     url.search = new URLSearchParams({
         account_id: account_id,
@@ -484,11 +508,56 @@ function drawFrequentRouteOnMap(myJSON) {
             path: trip,
             geodesic: true,
             strokeColor: '#e74c3c',
-            strokeOpacity: 0.3,
+            strokeOpacity: 0.5,
             strokeWeight: 5
         });
         flightPath.setMap(map);
         listGridTrip.push(flightPath);
+
+        var lat = uiSettings.LatOrigin + (uiSettings.size * (myJSON[i][0].lat- 1) + uiSettings.size / 2);
+        var lng = uiSettings.LngOrigin + (uiSettings.size * (myJSON[i][0].lng - 1) + uiSettings.size / 2);
+        drawMarker("origin","Origin Route "+i, lat, lng);
+
+         lat = uiSettings.LatOrigin + (uiSettings.size * (myJSON[i][myJSON[i].length-1].lat- 1) + uiSettings.size / 2);
+         lng = uiSettings.LngOrigin + (uiSettings.size * (myJSON[i][myJSON[i].length-1].lng - 1) + uiSettings.size / 2);
+        drawMarker("destination","Destination Route "+i, lat,lng);
+
     }
     polylineOverlay.elements = listGridTrip;
 }
+
+function drawMarker(type,title, lat, lng) {
+    if(type == "origin") {
+        var marker = new google.maps.Marker({
+            position: new google.maps.LatLng(lat, lng),
+            icon: {
+                path: google.maps.SymbolPath.CIRCLE,
+                strokeColor: '#F00',
+                fillColor: '#F00',
+                fillOpacity: 0.3,
+                scale: 4
+            },
+            title: title,
+            map: map,
+        });
+        marker.setMap(map);
+        markeroverlay.elements.push(marker);
+    }
+    else {
+        var marker = new google.maps.Marker({
+            position: new google.maps.LatLng(lat, lng),
+            icon: {
+                path: "M -2,-2 2,-2 2,2 -2,2 z",
+                strokeColor: '#F00',
+                fillColor: '#F00',
+                fillOpacity: 0.3,
+                scale: 1.5
+            },
+            title: title,
+            map: map,
+        });
+        marker.setMap(map);
+        markeroverlay.elements.push(marker);
+    }
+}
+
